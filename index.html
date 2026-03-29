@@ -1,9 +1,8 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Media Gallery Base</title>
+    <title>Media Gallery</title>
+
     <script type="importmap">
     {
       "imports": {
@@ -11,178 +10,29 @@
       }
     }
     </script>
+
     <link rel="stylesheet" href="style.css">
 </head>
-<body class="theme-light">
-    <div id="app">
-        <!-- Navigation -->
-        <header>
-            <div class="logo">KGI's <span>Domain</span></div>
+<body>
 
-            <div class="search-container">
-                <input type="text" id="search-input" placeholder="Search files...">
-            </div>
+<header>
+    <h2>Media Gallery</h2>
+    <p>Drag & drop files or double-click anywhere</p>
+</header>
 
-            <!-- View controls: grid / list / details + size slider -->
-            <div id="view-controls" class="view-controls">
-                <div class="view-buttons" role="toolbar" aria-label="View type">
-                    <button id="view-grid" class="icon-btn active" title="Grid view"><i data-lucide="grid"></i></button>
-                    <button id="view-list" class="icon-btn" title="List view"><i data-lucide="list"></i></button>
-                    <button id="view-details" class="icon-btn" title="Details view"><i data-lucide="columns"></i></button>
-                </div>
-                <div class="size-control" title="Thumbnail size">
-                    <input type="range" id="thumb-size" min="120" max="360" value="180">
-                </div>
-            </div>
+<div class="grid" id="media-grid"></div>
 
-            <div class="nav-actions">
-                <button id="settings-btn" class="icon-btn" title="Settings">
-                    <i data-lucide="settings"></i>
-                </button>
-            </div>
-        </header>
+<!-- image modal -->
+<div id="image-modal" class="hidden">
+    <img id="modal-img">
+</div>
 
-        <!-- Main Content -->
-        <main>
-            <nav class="sidebar">
-                <div class="nav-group">
-                    <h3>Library</h3>
-                    <button class="nav-item active" data-view="all"><i data-lucide="files"></i> All Files</button>
-                    <button class="nav-item" data-view="music"><i data-lucide="music"></i> Music</button>
-                    <button class="nav-item" data-view="images"><i data-lucide="image"></i> Images</button>
-                </div>
+<!-- audio player -->
+<div id="player" class="hidden">
+    <span id="track-title">Playing...</span>
+</div>
 
-                <div class="nav-group">
-                    <h3>Albums</h3>
-                    <div id="album-list">
-                        <!-- Albums dynamically inserted -->
-                    </div>
-                </div>
-            </nav>
+<script type="module" src="main.js"></script>
 
-            <section class="content-area">
-                <div class="breadcrumb" id="breadcrumb">
-                    <span>Root</span>
-                </div>
-                <div class="grid" id="media-grid">
-                    <!-- Media items dynamically inserted -->
-                </div>
-            </section>
-        </main>
-
-        <!-- Player Bar (Visible when music plays) -->
-        <div id="player-bar" class="hidden">
-            <div class="track-info">
-                <img id="player-thumb" src="" alt="">
-                <div>
-                    <div id="player-title">Title</div>
-                    <div id="player-artist">Artist</div>
-                </div>
-            </div>
-            <div class="player-controls">
-                <button id="prev-btn"><i data-lucide="skip-back"></i></button>
-                <button id="play-btn" class="play-main"><i data-lucide="play"></i></button>
-                <button id="next-btn"><i data-lucide="skip-forward"></i></button>
-                <div class="progress-container">
-                    <input type="range" id="progress" value="0">
-                </div>
-            </div>
-            <div class="volume-controls">
-                <i data-lucide="volume-2"></i>
-                <input type="range" id="volume" min="0" max="1" step="0.1" value="0.7">
-            </div>
-        </div>
-
-        <!-- Modals -->
-        <div id="modal-overlay" class="modal-overlay hidden">
-            <!-- Settings Modal -->
-            <div id="settings-modal" class="modal hidden">
-                <div class="modal-header">
-                    <h2>Settings</h2>
-                    <button class="close-modal">&times;</button>
-                </div>
-                <div class="modal-body">
-                    <div class="setting-row">
-                        <span>Theme Mode</span>
-                        <div class="toggle-group">
-                            <button id="light-mode-btn" class="active">Light</button>
-                            <button id="dark-mode-btn">Dark</button>
-                        </div>
-                    </div>
-                    
-                    <div id="admin-section" class="admin-locked">
-                        <p class="locked-text">Locked Settings</p>
-                        <button id="reveal-login-btn" class="primary-btn" style="width:100%;margin-bottom:10px;">Admin Login ▼</button>
-                        <div id="login-container" class="hidden drop-down">
-                            <input type="password" id="admin-pass" placeholder="Enter Admin Password">
-                            <button id="login-btn">Login</button>
-                        </div>
-                        
-                        <div id="admin-controls" class="hidden">
-                            <h3>Admin Panel</h3>
-                            <div class="admin-grid">
-                                <button id="upload-btn"><i data-lucide="upload"></i> Upload</button>
-                                <button id="create-album-btn"><i data-lucide="album"></i> New Album</button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Upload Modal -->
-            <div id="upload-modal" class="modal hidden">
-                <div class="modal-header">
-                    <h2>Upload Media</h2>
-                    <button class="close-modal">&times;</button>
-                </div>
-                <div class="modal-body">
-                    <input type="file" id="file-input" multiple accept=".wav,.flac,.mp3,.m4a,.png,.jpeg,.jpg">
-                    <div id="upload-preview"></div>
-                    <button id="start-upload" class="primary-btn">Complete Upload</button>
-                </div>
-            </div>
-
-            <!-- Metadata Editor -->
-            <div id="metadata-modal" class="modal hidden">
-                <div class="modal-header">
-                    <h2>Edit Metadata</h2>
-                    <button class="close-modal">&times;</button>
-                </div>
-                <div class="modal-body">
-                    <div class="form-group">
-                        <label>Title / Name</label>
-                        <input type="text" id="meta-title">
-                    </div>
-                    <div class="form-group">
-                        <label>Artist</label>
-                        <input type="text" id="meta-artist">
-                    </div>
-                    <div class="form-group">
-                        <label>Album</label>
-                        <input type="text" id="meta-album">
-                    </div>
-                    <button id="save-metadata" class="primary-btn">Save Changes</button>
-                </div>
-            </div>
-
-            <!-- Image Lightbox -->
-            <div id="image-lightbox" class="image-lightbox hidden">
-                <button class="close-lightbox close-modal" title="Close">&times;</button>
-                <img id="lightbox-img" src="" alt="Preview">
-            </div>
-
-            <!-- File Info Modal (images & audio details + actions) -->
-            <div id="file-info-modal" class="modal file-info-modal hidden">
-                <div class="modal-header">
-                    <h2 id="info-title">File Info</h2>
-                    <button class="close-modal" id="close-file-info">&times;</button>
-                </div>
-                <div class="modal-body" id="info-body">
-                    <!-- Content populated dynamically -->
-                </div>
-            </div>
-        </div>
-    </div>
-    <script type="module" src="main.js"></script>
 </body>
 </html>
